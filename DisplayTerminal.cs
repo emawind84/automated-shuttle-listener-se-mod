@@ -72,6 +72,7 @@ namespace IngameScript
                 foreach (var shuttleInfo in program.Shuttles.Values)
                 {
                     lcd.WriteText($"{shuttleInfo.Name}\n{shuttleInfo.Message}", true);
+                    lcd.WriteText("\n-----------\n", true);
                 }
             }
 
