@@ -21,7 +21,9 @@ namespace IngameScript
 {
     partial class Program : MyGridProgram
     {
-        const string ScriptPrefixTag = "SHUTTLE";
+        const string ScriptPrefixTag = "SHUTTLE_LISTENER";
+
+        const string DisplayTerminalTag = ScriptPrefixTag + ":DisplayTerminal";
 
         /// <summary>
         /// whether to use real time (second between calls) or pure UpdateFrequency
@@ -31,7 +33,7 @@ namespace IngameScript
         /// <summary>
         /// Defines the FREQUENCY.
         /// </summary>
-        const UpdateFrequency FREQUENCY = UpdateFrequency.Once;
+        const UpdateFrequency FREQUENCY = UpdateFrequency.Update100;
         /// <summary>
         /// How often the script should update in milliseconds
         /// </summary>
@@ -108,9 +110,15 @@ namespace IngameScript
         /// </summary>
         IEnumerator<bool> terminalCycle;
 
-        public const string STATE_BROADCAST_TAG = "SHUTTLE_STATE";
+        DebugTerminal debugTerminals;
 
-        public IMyBroadcastListener BroadcastListener { get; }
+        DisplayTerminal informationTerminals;
+
+        const string STATE_BROADCAST_TAG = "SHUTTLE_STATE";
+
+        IMyBroadcastListener BroadcastListener { get; }
+
+        public Dictionary<long, ShuttleInfo> Shuttles { get; } = new Dictionary<long, ShuttleInfo>();
 
         #endregion
 
@@ -169,6 +177,8 @@ namespace IngameScript
                 Echo(log);
             };
 
+            debugTerminals = new DebugTerminal(this);
+            informationTerminals = new DisplayTerminal(this, blk => MyIni.HasSection(blk.CustomData, DisplayTerminalTag) && CollectSameConstruct(blk));
             terminalCycle = SetTerminalCycle();
 
             this.BroadcastListener = this.IGC.RegisterBroadcastListener(STATE_BROADCAST_TAG);
@@ -301,9 +311,8 @@ namespace IngameScript
         {
             while (true)
             {
-                yield return true;
-                //yield return debugTerminals.Run();
-                //yield return informationTerminals.Run();
+                yield return debugTerminals.Run();
+                yield return informationTerminals.Run();
             }
         }
 
@@ -315,11 +324,36 @@ namespace IngameScript
             while (this.BroadcastListener.HasPendingMessage)
             {
                 var message = this.BroadcastListener.AcceptMessage();
-                EchoR(message.As<string>());
+                var data = message.As<MyTuple<long, string, Vector3D, string>>();
+                var shuttleInfo = new ShuttleInfo
+                {
+                    ID = data.Item1,
+                    Name = data.Item2,
+                    Position = data.Item3,
+                    Message = data.Item4
+                };
+
+                Shuttles[shuttleInfo.ID] = shuttleInfo;
+
+                EchoR(shuttleInfo.ToString());
                 throw new PutOffExecutionException();
             }
             processStep++;
         }
 
+        public struct ShuttleInfo
+        {
+            public long ID { get; set; }
+            public string Name { get; set; }
+            public Vector3D Position { get; set; }
+            public string Message { get; set; }
+
+            public override string ToString()
+            {
+                return $"{this.Name}" + Environment.NewLine +
+                    $"Position: {this.Position}" + Environment.NewLine +
+                    $"Msg: {this.Message}";
+            }
+        }
     }
 }
