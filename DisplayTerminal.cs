@@ -71,7 +71,10 @@ namespace IngameScript
                 lcd.WriteText("");
                 foreach (var shuttleInfo in program.Shuttles.Values)
                 {
-                    lcd.WriteText($"{shuttleInfo.Name}\n{shuttleInfo.Message}", true);
+                    lcd.WriteText(string.Format("{0}\n{1}", 
+                        shuttleInfo.Name, 
+                        shuttleInfo.IsRecent ? shuttleInfo.Message : "N/A"), 
+                        true);
                     lcd.WriteText("\n-----------\n", true);
                 }
             }

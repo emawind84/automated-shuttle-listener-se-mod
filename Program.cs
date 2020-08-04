@@ -330,7 +330,8 @@ namespace IngameScript
                     ID = data.Item1,
                     Name = data.Item2,
                     Position = data.Item3,
-                    Message = data.Item4
+                    Message = data.Item4,
+                    Created = DateTime.Now
                 };
 
                 Shuttles[shuttleInfo.ID] = shuttleInfo;
@@ -347,7 +348,10 @@ namespace IngameScript
             public string Name { get; set; }
             public Vector3D Position { get; set; }
             public string Message { get; set; }
+            public DateTime Created { get; set; }
 
+            public bool IsRecent => DateTime.Now - this.Created < new TimeSpan(0, 0, 30);
+            
             public override string ToString()
             {
                 return $"{this.Name}" + Environment.NewLine +
