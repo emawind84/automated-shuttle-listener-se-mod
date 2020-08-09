@@ -21,9 +21,6 @@ namespace IngameScript
 {
     partial class Program : MyGridProgram
     {
-        delegate bool CollectDetectedBlocks(MyDetectedEntityInfo blk);
-
-        delegate bool CollectBlocks(IMyTerminalBlock blk);
 
         float RemainingBatteryCapacity(List<IMyBatteryBlock> batteries)
         {
@@ -52,7 +49,7 @@ namespace IngameScript
             return block.IsSameConstructAs(Me); ;
         }
 
-        void EnableBlocks(CollectBlocks collect, bool enable = true)
+        void EnableBlocks(Func<IMyFunctionalBlock, bool> collect, bool enable = true)
         {
             var blocks = new List<IMyFunctionalBlock>();
             GridTerminalSystem.GetBlocksOfType(blocks, blk => collect(blk));
