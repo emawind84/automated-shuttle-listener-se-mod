@@ -40,7 +40,7 @@ namespace IngameScript
                     this.collect = collect;
                 } else
                 {
-                    this.collect = blk => MyIni.HasSection(blk.CustomData, ScriptPrefixTag);
+                    this.collect = blk => MyIni.HasSection(blk.CustomData, DisplayTerminalTag);
                 }
             }
 
@@ -54,7 +54,8 @@ namespace IngameScript
 
                 MyIni ini = new MyIni();
                 ini.TryParse(block.CustomData);
-                var display = ini.Get(ScriptPrefixTag, "Display").ToInt16();
+                var display = ini.Get(DisplayTerminalTag, "Display").ToInt16();
+                var shuttleName = ini.Get(DisplayTerminalTag, "ShuttleName").ToString("*");
 
                 IMyTextSurface lcd;
                 if (block is IMyTextSurfaceProvider)
@@ -69,13 +70,15 @@ namespace IngameScript
                 lcd.ContentType = ContentType.TEXT_AND_IMAGE;
 
                 lcd.WriteText("");
-                foreach (var shuttleInfo in program.Shuttles.Values)
+                var _t = program.Shuttles.Values.Where(shuttle => shuttleName.Equals(shuttle.Name) || shuttleName.Equals("*"));
+                foreach (var shuttleInfo in _t)
                 {
-                    lcd.WriteText(string.Format("{0}\n{1}", 
-                        shuttleInfo.Name, 
-                        shuttleInfo.IsRecent ? shuttleInfo.Message : "N/A"), 
+                    lcd.WriteText(string.Format("{0}\n{1}",
+                        shuttleInfo.Name,
+                        shuttleInfo.IsRecent ? shuttleInfo.Message : "N/A"),
                         true);
-                    lcd.WriteText("\n-----------\n", true);
+                    if (_t.Count() > 1)
+                        lcd.WriteText("\n-----------\n", true);
                 }
             }
 

@@ -178,7 +178,7 @@ namespace IngameScript
             };
 
             debugTerminals = new DebugTerminal(this);
-            informationTerminals = new DisplayTerminal(this, blk => MyIni.HasSection(blk.CustomData, DisplayTerminalTag) && CollectSameConstruct(blk));
+            informationTerminals = new DisplayTerminal(this);
             terminalCycle = SetTerminalCycle();
 
             this.BroadcastListener = this.IGC.RegisterBroadcastListener(STATE_BROADCAST_TAG);
@@ -336,7 +336,7 @@ namespace IngameScript
 
                 Shuttles[shuttleInfo.ID] = shuttleInfo;
 
-                EchoR(shuttleInfo.ToString());
+                //EchoR(shuttleInfo.ToString());
                 throw new PutOffExecutionException();
             }
             processStep++;
