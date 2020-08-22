@@ -21,19 +21,22 @@ namespace IngameScript
 {
     partial class Program : MyGridProgram
     {
+        #region mdk preserve
+
+        // the main tag of the script
         const string ScriptPrefixTag = "SHUTTLE_LISTENER";
 
-        const string DisplayTerminalTag = ScriptPrefixTag + ":DisplayTerminal";
+        // the tag used for displaying message information on LCD (to put into Custom Data)
+        string DisplayTerminalTag = ScriptPrefixTag + ":DisplayTerminal";
 
-        /// <summary>
-        /// whether to use real time (second between calls) or pure UpdateFrequency
-        /// for update frequency
-        /// </summary>
+        // whether to use real time (second between calls) or pure UpdateFrequency for update frequency
         readonly bool USE_REAL_TIME = false;
-        /// <summary>
-        /// Defines the FREQUENCY.
-        /// </summary>
+
+        // Defines the FREQUENCY.
         const UpdateFrequency FREQUENCY = UpdateFrequency.Update100;
+
+        #endregion
+
         /// <summary>
         /// How often the script should update in milliseconds
         /// </summary>
@@ -52,14 +55,14 @@ namespace IngameScript
         /// A wrapper for the <see cref="Echo"/> function that adds the log to the stored log.
         /// This allows the log to be remembered and re-outputted without extra work.
         /// </summary>
-        public Action<string> EchoR;
+        Action<string> EchoR;
 
         #region Script state & storage
 
         /// <summary>
         /// Handle Custom Data settings
         /// </summary>
-        public MyIni _ini = new MyIni();
+        MyIni _ini = new MyIni();
         /// <summary>
         /// Handle script arguments
         /// </summary>
@@ -103,8 +106,8 @@ namespace IngameScript
         /// Stores the output of Echo so we can effectively ignore some calls
         /// without overwriting it.
         /// </summary>
-        public StringBuilder echoOutput = new StringBuilder();
-        
+        StringBuilder EchoOutput = new StringBuilder();
+
         /// <summary>
         /// Defines the terminalCycle.
         /// </summary>
@@ -118,7 +121,7 @@ namespace IngameScript
 
         IMyBroadcastListener BroadcastListener { get; }
 
-        public Dictionary<long, ShuttleInfo> Shuttles { get; } = new Dictionary<long, ShuttleInfo>();
+        Dictionary<long, ShuttleInfo> Shuttles { get; } = new Dictionary<long, ShuttleInfo>();
 
         #endregion
 
@@ -128,7 +131,7 @@ namespace IngameScript
         /// The length of time we have been executing for.
         /// Measured in milliseconds.
         /// </summary>
-        int ExecutionTime
+        private int ExecutionTime
         {
             get { return (int)((DateTime.Now - currentCycleStartTime).TotalMilliseconds + 0.5); }
         }
@@ -136,7 +139,7 @@ namespace IngameScript
         /// <summary>
         /// The current percent load of the call.
         /// </summary>
-        double ExecutionLoad
+        private double ExecutionLoad
         {
             get { return Runtime.CurrentInstructionCount / Runtime.MaxInstructionCount; }
         }
@@ -173,7 +176,7 @@ namespace IngameScript
             // init echo wrapper
             EchoR = log =>
             {
-                echoOutput.AppendLine(log);
+                EchoOutput.AppendLine(log);
                 Echo(log);
             };
 
@@ -212,7 +215,7 @@ namespace IngameScript
                     currentCycleStartTime = n;
                 else
                 {
-                    Echo(echoOutput.ToString()); // ensure that output is not lost
+                    Echo(EchoOutput.ToString()); // ensure that output is not lost
                     return;
                 }
             }
@@ -221,7 +224,7 @@ namespace IngameScript
                 currentCycleStartTime = DateTime.Now;
             }
 
-            echoOutput.Clear();
+            EchoOutput.Clear();
 
             // output terminal info
             EchoR(string.Format(scriptUpdateText, ++totalCallCount, currentCycleStartTime.ToString("h:mm:ss tt")));
@@ -341,23 +344,6 @@ namespace IngameScript
             }
             processStep++;
         }
-
-        public struct ShuttleInfo
-        {
-            public long ID { get; set; }
-            public string Name { get; set; }
-            public Vector3D Position { get; set; }
-            public string Message { get; set; }
-            public DateTime Created { get; set; }
-
-            public bool IsRecent => DateTime.Now - this.Created < new TimeSpan(0, 0, 30);
-            
-            public override string ToString()
-            {
-                return $"{this.Name}" + Environment.NewLine +
-                    $"Position: {this.Position}" + Environment.NewLine +
-                    $"Msg: {this.Message}";
-            }
-        }
+        
     }
 }

@@ -51,6 +51,7 @@
     <AdditionalFiles Include="Instructions.readme" />
     <AdditionalFiles Include="thumb.png" />
     <AdditionalFiles Include="MDK\whitelist.cache" />
+    <Compile Include="ShuttleInfo.cs" />
     <Compile Include="Terminal.cs" />
     <Compile Include="Utils.cs" />
   </ItemGroup>

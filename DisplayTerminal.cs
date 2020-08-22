@@ -40,7 +40,7 @@ namespace IngameScript
                     this.collect = collect;
                 } else
                 {
-                    this.collect = blk => MyIni.HasSection(blk.CustomData, DisplayTerminalTag);
+                    this.collect = blk => MyIni.HasSection(blk.CustomData, Program.DisplayTerminalTag);
                 }
             }
 
@@ -54,8 +54,8 @@ namespace IngameScript
 
                 MyIni ini = new MyIni();
                 ini.TryParse(block.CustomData);
-                var display = ini.Get(DisplayTerminalTag, "Display").ToInt16();
-                var shuttleName = ini.Get(DisplayTerminalTag, "ShuttleName").ToString("*");
+                var display = ini.Get(Program.DisplayTerminalTag, "Display").ToInt16();
+                var shuttleName = ini.Get(Program.DisplayTerminalTag, "ShuttleName").ToString("*");
 
                 IMyTextSurface lcd;
                 if (block is IMyTextSurfaceProvider)
@@ -70,7 +70,7 @@ namespace IngameScript
                 lcd.ContentType = ContentType.TEXT_AND_IMAGE;
 
                 lcd.WriteText("");
-                var _t = program.Shuttles.Values.Where(shuttle => shuttleName.Equals(shuttle.Name) || shuttleName.Equals("*"));
+                var _t = Program.Shuttles.Values.Where(shuttle => shuttleName.Equals(shuttle.Name) || shuttleName.Equals("*"));
                 foreach (var shuttleInfo in _t)
                 {
                     lcd.WriteText(string.Format("{0}\n{1}",
@@ -93,7 +93,7 @@ namespace IngameScript
                 
                 // Collect this.
                 bool isValidBlock = collect(terminal)
-                    && terminal.IsSameConstructAs(program.Me)
+                    && terminal.IsSameConstructAs(Program.Me)
                     && (terminal is IMyTextPanel || terminal is IMyTextSurfaceProvider)
                     && terminal.IsWorking;
 
